@@ -16,6 +16,8 @@ class AltoWebView: WKWebView {
         AltoWebView.aliveWebViewsCount += 1
         #endif
         allowsMagnification = true
+        allowsBackForwardNavigationGestures = true
+
     
         customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15"
     }
