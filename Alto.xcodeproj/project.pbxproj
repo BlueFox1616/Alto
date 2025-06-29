@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C49770FD2E02F27500CD80AF /* OpenADK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C49770FC2E02F27500CD80AF /* OpenADK.framework */; };
-		C49770FE2E02F27500CD80AF /* OpenADK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C49770FC2E02F27500CD80AF /* OpenADK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C4D5A48B2DFFD4E700002E71 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = C4D5A48A2DFFD4E700002E71 /* SwiftSoup */; };
 		C4E36BE02DCEDCB200B049A3 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = C4E36BDF2DCEDCB200B049A3 /* Algorithms */; };
 /* End PBXBuildFile section */
@@ -30,20 +28,6 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		C4AFFDF42E007520001D60F8 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				C49770FE2E02F27500CD80AF /* OpenADK.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		C49770FC2E02F27500CD80AF /* OpenADK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = OpenADK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4E36B4D2DCEB6C200B049A3 /* Alto.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Alto.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -55,7 +39,7 @@
 		3EC60F0F2E02E00F00CCC77B /* Exceptions for "Alto" folder in "Alto" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Configurations/Info.plist,
+				Info.plist,
 			);
 			target = C4E36B4C2DCEB6C200B049A3 /* Alto */;
 		};
@@ -78,7 +62,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C4E36BE02DCEDCB200B049A3 /* Algorithms in Frameworks */,
-				C49770FD2E02F27500CD80AF /* OpenADK.framework in Frameworks */,
 				C4D5A48B2DFFD4E700002E71 /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -137,7 +120,6 @@
 				C4E36B492DCEB6C200B049A3 /* Sources */,
 				C4E36B4A2DCEB6C200B049A3 /* Frameworks */,
 				C4E36B4B2DCEB6C200B049A3 /* Resources */,
-				C4AFFDF42E007520001D60F8 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -376,7 +358,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Alto/Configurations/Alto.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Alto/Alto.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -386,7 +368,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ./Alto/Configurations/Info.plist;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/Alto/AltoObjC\"";
+				INFOPLIST_FILE = ./Alto/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -397,6 +380,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Alto-Browser.Alto";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Alto/AltoObjC/Alto-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Development;
@@ -562,7 +546,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Alto/Configurations/Alto.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Alto/Alto.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -572,7 +556,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ./Alto/Configurations/Info.plist;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/Alto/AltoObjC\"";
+				INFOPLIST_FILE = ./Alto/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -583,6 +568,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Alto-Browser.Alto";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Alto/AltoObjC/Alto-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -592,7 +578,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Alto/Configurations/Alto.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Alto/Alto.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -602,7 +588,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ./Alto/Configurations/Info.plist;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/Alto/AltoObjC\"";
+				INFOPLIST_FILE = ./Alto/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -613,6 +600,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Alto-Browser.Alto";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Alto/AltoObjC/Alto-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

@@ -1,6 +1,5 @@
 // FavoriteDropZoneView.swift
 
-import OpenADK
 import SwiftUI
 
 // MARK: - FavoriteDropZoneView

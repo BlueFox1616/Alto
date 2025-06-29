@@ -117,7 +117,7 @@ public class DownloadViewModel {
         withAnimation(.spring(duration: 0.3)) {
             isShowingDownloads.toggle()
         }
-        logger.info("📥 Downloads panel toggled: \(isShowingDownloads ? "shown" : "hidden")")
+        //logger.info("📥 Downloads panel toggled: \(isShowingDownloads ? "shown" : "hidden")")
     }
 
     /// Close downloads panel

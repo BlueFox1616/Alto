@@ -1,7 +1,6 @@
 
-import Algorithms
+internal import Algorithms
 import Observation
-import OpenADK
 import SwiftUI
 import UniformTypeIdentifiers
 

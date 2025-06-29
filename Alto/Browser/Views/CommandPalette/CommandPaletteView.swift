@@ -5,7 +5,6 @@
 //  Created by Hunor Zoltáni on 19.06.2025.
 //
 
-import OpenADK
 import SwiftUI
 
 struct CommandPaletteView: View {

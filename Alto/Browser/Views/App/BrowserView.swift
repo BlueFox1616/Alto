@@ -1,6 +1,5 @@
 //
 
-import OpenADK
 import SwiftUI
 
 struct BrowserView: View {

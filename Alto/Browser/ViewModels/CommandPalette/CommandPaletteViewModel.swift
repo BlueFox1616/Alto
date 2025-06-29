@@ -7,7 +7,6 @@
 
 import Foundation
 import Observation
-import OpenADK
 import SwiftUI
 
 extension CommandPaletteView {

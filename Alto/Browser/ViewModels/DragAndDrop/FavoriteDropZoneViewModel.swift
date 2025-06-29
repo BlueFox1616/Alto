@@ -1,7 +1,6 @@
 //
 import AppKit
 import Observation
-import OpenADK
 
 @Observable
 class FavoriteDropZoneViewModel: DropZoneViewModel {

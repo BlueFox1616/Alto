@@ -1,5 +1,4 @@
 import AppKit
-import OpenADK
 import WebKit
 
 /// Handles major portions of tha app lifecycle

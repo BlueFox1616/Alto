@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import OpenADK
 import OSLog
 import WebKit
 
@@ -97,7 +96,7 @@ public class DownloadManager: NSObject, ObservableObject {
     @MainActor
     public func toggleDownloads() {
         isShowingDownloads.toggle()
-        logger.info("📥 Downloads panel toggled: \(isShowingDownloads ? "shown" : "hidden")")
+        //logger.info("📥 Downloads panel toggled: \(isShowingDownloads ? "shown" : "hidden")")
     }
 
     /// Start a download programmatically

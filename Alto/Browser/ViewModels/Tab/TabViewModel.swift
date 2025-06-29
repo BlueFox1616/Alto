@@ -1,5 +1,4 @@
 import Observation
-import OpenADK
 import SwiftUI
 
 @Observable

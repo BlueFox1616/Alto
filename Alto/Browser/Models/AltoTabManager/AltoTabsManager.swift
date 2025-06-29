@@ -7,7 +7,6 @@
 
 import AppKit
 import Observation
-import OpenADK
 import WebKit
 
 // MARK: - TabsManager
