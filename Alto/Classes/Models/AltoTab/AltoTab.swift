@@ -24,9 +24,9 @@ open class ADKTab: NSObject, Identifiable, ADKTabProtocol {
 
     public var activeContent: Displayable?
 
-    public var state: ADKState
+    public var state: AltoState
 
-    public var manager: ADKTabManager? {
+    public var manager: TabManager? {
         state.tabManager
     }
 
@@ -34,7 +34,7 @@ open class ADKTab: NSObject, Identifiable, ADKTabProtocol {
         manager?.currentTab?.id == id
     }
 
-    public init(state: ADKState) {
+    public init(state: AltoState) {
         self.state = state
     }
 
@@ -72,8 +72,8 @@ public protocol ADKTabProtocol: AnyObject, Identifiable {
     var location: TabLocation? { get set }
     var content: [any Displayable] { get set }
     var activeContent: Displayable? { get set }
-    var state: ADKState { get }
-    var manager: ADKTabManager? { get }
+    var state: AltoState { get }
+    var manager: TabManager? { get }
     var isCurrentTab: Bool { get }
 
     func setContent(content: any Displayable)

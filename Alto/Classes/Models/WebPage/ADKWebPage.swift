@@ -47,7 +47,7 @@ public class ADKWebPage: NSObject, Identifiable, Displayable {
     public var parent: ADKTab?
 
     /// The application state manager
-    private var state: ADKState
+    private var state: AltoState
 
     /// Unique identifier for this web page instance
     public let id = UUID()
@@ -89,7 +89,7 @@ public class ADKWebPage: NSObject, Identifiable, Displayable {
     ///   - webView: The AltoWebView instance to wrap
     ///   - state: The application state manager
     ///   - parent: Optional parent tab reference
-    public init(webView: ADKWebView, state: ADKState, parent: ADKTab? = nil) {
+    public init(webView: ADKWebView, state: AltoState, parent: ADKTab? = nil) {
         self.webView = webView
         self.state = state
         super.init()

@@ -12,7 +12,7 @@ import SwiftUI
 
 /// Alto is a singleton that allows for global app data such as tab instances or spaces
 @Observable
-public class AltoData: ADKDataProtocol {
+public class AltoData {
     // MARK: - Properties
 
     public static let shared = AltoData()

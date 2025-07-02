@@ -13,7 +13,7 @@ struct BrowserView: View {
             BrowserContentView()
             CommandPaletteView()
         }
-        .preferredColorScheme(PreferencesManager.shared.colorScheme)
+        .preferredColorScheme(PreferencesManager.shared.colorScheme.asColorScheme)
         .ignoresSafeArea()
     }
 }

@@ -1,5 +1,5 @@
 
-internal import Algorithms
+import Algorithms
 import Observation
 import SwiftUI
 import UniformTypeIdentifiers

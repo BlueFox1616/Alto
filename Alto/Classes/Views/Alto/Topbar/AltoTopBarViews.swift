@@ -40,8 +40,8 @@ struct AltoTopBar: View {
 @Observable
 class SpacePickerViewModel {
     var state: AltoState
-    var tabManager: AltoTabsManager? {
-        state.tabManager as? AltoTabsManager
+    var tabManager: TabManager? {
+        state.tabManager
     }
 
     // Changed `spaces` to a computed property to ensure it's always up-to-date.

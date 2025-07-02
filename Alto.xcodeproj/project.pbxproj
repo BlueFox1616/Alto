@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C4D5A48B2DFFD4E700002E71 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = C4D5A48A2DFFD4E700002E71 /* SwiftSoup */; };
-		C4E36BE02DCEDCB200B049A3 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = C4E36BDF2DCEDCB200B049A3 /* Algorithms */; };
+		C4EE39632E135F610064B46D /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = C4EE39622E135F610064B46D /* Algorithms */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,8 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C4E36BE02DCEDCB200B049A3 /* Algorithms in Frameworks */,
-				C4D5A48B2DFFD4E700002E71 /* SwiftSoup in Frameworks */,
+				C4EE39632E135F610064B46D /* Algorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,8 +128,7 @@
 			);
 			name = Alto;
 			packageProductDependencies = (
-				C4E36BDF2DCEDCB200B049A3 /* Algorithms */,
-				C4D5A48A2DFFD4E700002E71 /* SwiftSoup */,
+				C4EE39622E135F610064B46D /* Algorithms */,
 			);
 			productName = Alto;
 			productReference = C4E36B4D2DCEB6C200B049A3 /* Alto.app */;
@@ -210,9 +207,8 @@
 			mainGroup = C4E36B442DCEB6C200B049A3;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				C4E36BDE2DCEDCB200B049A3 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				C4D5A3642DFFD37C00002E71 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
-				3E5E9D832E05A3E30072BA7C /* XCLocalSwiftPackageReference "../OpenADK" */,
+				C4EE39612E135F610064B46D /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C4E36B4E2DCEB6C200B049A3 /* Products */;
@@ -375,7 +371,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Alto-Browser.Alto";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -563,7 +559,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Alto-Browser.Alto";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -595,7 +591,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Alto-Browser.Alto";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -722,13 +718,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		3E5E9D832E05A3E30072BA7C /* XCLocalSwiftPackageReference "../OpenADK" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../OpenADK;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		C4D5A3642DFFD37C00002E71 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -738,7 +727,7 @@
 				minimumVersion = 2.8.8;
 			};
 		};
-		C4E36BDE2DCEDCB200B049A3 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+		C4EE39612E135F610064B46D /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-algorithms.git";
 			requirement = {
@@ -749,14 +738,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		C4D5A48A2DFFD4E700002E71 /* SwiftSoup */ = {
+		C4EE39622E135F610064B46D /* Algorithms */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C4D5A3642DFFD37C00002E71 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
-			productName = SwiftSoup;
-		};
-		C4E36BDF2DCEDCB200B049A3 /* Algorithms */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C4E36BDE2DCEDCB200B049A3 /* XCRemoteSwiftPackageReference "swift-algorithms" */;
+			package = C4EE39612E135F610064B46D /* XCRemoteSwiftPackageReference "swift-algorithms" */;
 			productName = Algorithms;
 		};
 /* End XCSwiftPackageProductDependency section */

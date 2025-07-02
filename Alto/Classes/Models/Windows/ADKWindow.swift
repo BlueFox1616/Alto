@@ -9,27 +9,28 @@ import AppKit
 
 // MARK: - AltoWindow
 
-open class ADKWindow: NSWindow {
+open class AltoWindow: NSWindow {
     public private(set) var id = UUID()
     public var profile: Profile?
 
-    public let state: ADKState
+    public let state: AltoState
 
-    private var data: ADKData {
-        ADKData.shared
+    private var data: AltoData {
+        AltoData.shared
     }
 
     private var hostingView: NSView?
+    public var showWinowButtons = false
 
     public init(
         rootView: NSView? = nil,
-        state: ADKState? = nil,
+        state: AltoState? = nil,
         profile: Profile? = nil,
         useDefaultProfile: Bool = true,
         contentRect: NSRect? = nil
     ) {
         let config = DefaultWindowConfiguration()
-        self.state = state ?? ADKState()
+        self.state = state ?? AltoState()
         let defaultProfile = ProfileManager.shared.defaultProfile
         self.profile = useDefaultProfile ? defaultProfile : profile
 
@@ -41,6 +42,21 @@ open class ADKWindow: NSWindow {
         )
         minSize = config.defaultMinimumSize
 
+        /// Window Configurations
+        toolbar?.isVisible = false
+        titlebarAppearsTransparent = true
+        titleVisibility = .hidden
+        isReleasedWhenClosed = false
+        isMovableByWindowBackground = false
+        isMovable = false
+
+        /// Removes the window buttons
+        if !showWinowButtons {
+            standardWindowButton(NSWindow.ButtonType.closeButton)?.isHidden = true
+            standardWindowButton(NSWindow.ButtonType.zoomButton)?.isHidden = true
+            standardWindowButton(NSWindow.ButtonType.miniaturizeButton)?.isHidden = true
+        }
+        
         // let defaultView = NSHostingView(rootView: DefaultBrowserView())
         contentView = rootView // ?? defaultView
     }

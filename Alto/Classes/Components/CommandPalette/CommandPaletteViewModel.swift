@@ -43,7 +43,7 @@ extension CommandPaletteView {
         ///   - text: The text to search with or navigate to.
         ///   - tabManager: The tab manager to create new tabs with.
         ///   - altoState: The app state to update the command palette visibility.
-        func handlePerformSearch(text: String, tabManager: AltoTabsManager?, altoState: AltoState) {
+        func handlePerformSearch(text: String, tabManager: TabManager?, altoState: AltoState) {
             guard let tabManager else { return }
 
             if searchManager.isValidURL(text) {

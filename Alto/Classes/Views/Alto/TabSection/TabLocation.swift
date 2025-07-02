@@ -22,7 +22,7 @@ open class TabLocation {
 
     public func appendTabRep(_ tabRep: TabRepresentation) {
         tabs.append(tabRep)
-        let tab = ADKData.shared.getTab(id: tabRep.id)
+        let tab = AltoData.shared.getTab(id: tabRep.id)
         tab?.location = self
     }
 

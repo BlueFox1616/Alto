@@ -5,7 +5,6 @@ import SwiftUI
 
 struct BrowserContentView: View {
     @Environment(AltoState.self) private var altoState
-    @Bindable var preferences: PreferencesManager = .shared
 
     var data: AltoData {
         AltoData.shared

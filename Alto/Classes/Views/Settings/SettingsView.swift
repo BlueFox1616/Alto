@@ -36,22 +36,27 @@ struct SettingsView: View {
                 }
         }
         .frame(minWidth: 600, minHeight: 500)
-        .preferredColorScheme(PreferencesManager.shared.colorScheme)
+        .preferredColorScheme(PreferencesManager.shared.colorScheme.asColorScheme)
     }
 }
 
 // MARK: - GeneralSettingsView
 
+import SwiftUI
+import Observation
+
 struct GeneralSettingsView: View {
     @Bindable var preferences: PreferencesManager
-
+    @Bindable var scheme = PreferencesManager.shared
+    
     var body: some View {
         Form {
+            
             Section("Appearance") {
-                Picker("Theme", selection: $preferences.storedColorScheme) {
-                    Label("Light", systemImage: "sun.max").tag("light")
-                    Label("Dark", systemImage: "moon").tag("dark")
-                    Label("System", systemImage: "gear").tag("system")
+                Picker("Theme", selection: $scheme.colorScheme) {
+                    ForEach(ColorSchemePreference.allCases) { scheme in
+                        Text(scheme.displayName).tag(scheme)
+                    }
                 }
                 .pickerStyle(.menu)
 
@@ -65,10 +70,10 @@ struct GeneralSettingsView: View {
             }
 
             Section("Search") {
-                Picker("Search Engine", selection: $preferences.storedSearchEngine) {
+                Picker("Search Engine", selection: $preferences.searchEngine) {
                     ForEach(SearchManager.popularSearchEngines, id: \.rawValue) { engine in
                         Label(engine.displayName, systemImage: engine.iconName)
-                            .tag(engine.rawValue)
+                            .tag(engine)
                     }
                 }
                 .pickerStyle(.menu)

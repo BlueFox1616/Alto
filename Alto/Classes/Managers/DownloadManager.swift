@@ -237,7 +237,7 @@ public class DownloadManager: NSObject, ObservableObject {
         case retry
         case remove
     }
-
+    
     @MainActor
     private func performDownloadAction(_ downloadId: UUID, action: DownloadAction) {
         guard let downloadItem = downloads.first(where: { $0.id == downloadId }) else {

@@ -6,8 +6,8 @@ class TabViewModel {
     var state: AltoState
     var tab: TabRepresentation
     var draggingViewModel: DropZoneViewModel
-    var tabManager: AltoTabsManager? {
-        state.tabManager as? AltoTabsManager
+    var tabManager: TabManager? {
+        state.tabManager
     }
 
     var altoTab: ADKTab? {

@@ -41,7 +41,7 @@ struct CommandPaletteView: View {
 
                                 viewModel.handlePerformSearch(
                                     text: textToSubmit,
-                                    tabManager: altoState.tabManager as? AltoTabsManager,
+                                    tabManager: altoState.tabManager as? TabManager,
                                     altoState: altoState
                                 )
                             }
@@ -95,7 +95,7 @@ struct CommandPaletteView: View {
                                     .onTapGesture {
                                         viewModel.handlePerformSearch(
                                             text: suggestion.text,
-                                            tabManager: altoState.tabManager as? AltoTabsManager,
+                                            tabManager: altoState.tabManager,
                                             altoState: altoState
                                         )
                                     }

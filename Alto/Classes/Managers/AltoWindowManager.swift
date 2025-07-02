@@ -7,7 +7,7 @@ open class AltoWindowManager {
 
     public var defaultConfig: DefaultWindowConfiguration = .init()
 
-    public var windows: [ADKWindow] = []
+    public var windows: [AltoWindow] = []
 
     private var defaultProfile: Profile {
         ProfileManager.shared.defaultProfile
@@ -20,7 +20,7 @@ open class AltoWindowManager {
         profile: Profile? = nil,
         tabs: [ADKTab] = [],
         contentRect: NSRect? = nil
-    ) -> ADKWindow? {
+    ) -> AltoWindow? {
         let viewState = AltoState()
 
         let contentView = BrowserView()
