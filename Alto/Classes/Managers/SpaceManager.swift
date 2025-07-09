@@ -3,7 +3,6 @@
 // MARK: - SpaceManager
 
 public class SpaceManager {
-    public var currentSpace: Space?
 
     private var currentSpaceIndex = 0
     public var spaces: [Space] {

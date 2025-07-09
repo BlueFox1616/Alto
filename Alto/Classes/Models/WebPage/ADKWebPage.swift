@@ -79,7 +79,7 @@ public class ADKWebPage: NSObject, Identifiable, Displayable {
     public var uiDelegate: WKUIDelegate?
 
     /// Download delegate for handling download events
-    public var uiDownloadDelegate: WKDownloadDelegate?
+    public var downloadDelegate: WKDownloadDelegate?
 
     /// Navigation delegate for handling navigation events
     public var navigationDelegate: WKNavigationDelegate?
@@ -98,8 +98,6 @@ public class ADKWebPage: NSObject, Identifiable, Displayable {
         webView.ownerTab = self
         webView.uiDelegate = self
         webView.navigationDelegate = self
-
-        setupContextMenuHandling()
     }
 
     /// Creates a new tab with the specified URL and configuration
@@ -136,186 +134,6 @@ public class ADKWebPage: NSObject, Identifiable, Displayable {
         let contentview = NSViewContainerView(contentView: webview)
         return WebViewContainer(contentView: contentview, topContentInset: 0.0)
     }
-
-    /// Sets up context menu handling for image downloads
-    private func setupContextMenuHandling() {
-        guard let altoWebView = webView as? ADKWebView else { return }
-
-        // Add JavaScript to handle context menu events
-        let contextMenuScript = """
-        document.addEventListener('contextmenu', function(event) {
-            var element = event.target;
-            if (element.tagName === 'IMG') {
-                var imageData = {
-                    src: element.src,
-                    alt: element.alt || '',
-                    width: element.naturalWidth,
-                    height: element.naturalHeight
-                };
-                window.webkit.messageHandlers.contextMenu.postMessage({
-                    type: 'image',
-                    data: imageData,
-                    x: event.clientX,
-                    y: event.clientY
-                });
-            }
-        });
-        """
-
-        let userScript = WKUserScript(source: contextMenuScript, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
-        altoWebView.configuration.userContentController.addUserScript(userScript)
-        altoWebView.configuration.userContentController.add(self, name: "contextMenu")
-    }
-}
-
-// MARK: WKScriptMessageHandler
-
-extension ADKWebPage: WKScriptMessageHandler {
-    /// Handles JavaScript messages from the web view
-    /// - Parameters:
-    ///   - userContentController: The user content controller
-    ///   - message: The script message received
-    public func userContentController(
-        _ userContentController: WKUserContentController,
-        didReceive message: WKScriptMessage
-    ) {
-        guard message.name == "contextMenu",
-              let messageBody = message.body as? [String: Any],
-              let type = messageBody["type"] as? String,
-              type == "image",
-              let data = messageBody["data"] as? [String: Any],
-              let srcString = data["src"] as? String else { return }
-
-        handleImageContextMenu(imageUrl: srcString, imageData: data)
-    }
-
-    /// Handles context menu actions for images
-    /// - Parameters:
-    ///   - imageUrl: The URL of the image
-    ///   - imageData: Additional image metadata
-    private func handleImageContextMenu(imageUrl: String, imageData: [String: Any]) {
-        guard let url = URL(string: imageUrl) else { return }
-
-        // Create filename from image data
-        let alt = imageData["alt"] as? String ?? ""
-        let filename = generateImageFilename(from: url, alt: alt)
-
-        // Handle different types of image URLs
-        if url.scheme == "data" {
-            handleDataUrlImage(dataUrl: imageUrl, filename: filename)
-        } else if url.scheme == "blob" {
-            handleBlobUrlImage(blobUrl: imageUrl, filename: filename)
-        } else {
-            // Regular URL - use existing download mechanism
-            handleDownload(url: url, filename: filename)
-        }
-    }
-
-    /// Generates an appropriate filename for an image
-    /// - Parameters:
-    ///   - url: The image URL
-    ///   - alt: The alt text of the image
-    /// - Returns: A suitable filename for the image
-    private func generateImageFilename(from url: URL, alt: String) -> String {
-        // Try to get filename from URL
-        let urlFilename = url.lastPathComponent
-        if !urlFilename.isEmpty, urlFilename.contains(".") {
-            return urlFilename
-        }
-
-        // Use alt text if available
-        if !alt.isEmpty {
-            let cleanAlt = alt.replacingOccurrences(of: "[^a-zA-Z0-9\\s]", with: "", options: .regularExpression)
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-                .replacingOccurrences(of: "\\s+", with: "_", options: .regularExpression)
-
-            if !cleanAlt.isEmpty {
-                return "\(cleanAlt).jpg" // Default to jpg for images without extension
-            }
-        }
-
-        // Fallback to timestamp-based filename
-        let timestamp = Int(Date().timeIntervalSince1970)
-        return "image_\(timestamp).jpg"
-    }
-
-    /// Handles downloading images from data URLs
-    /// - Parameters:
-    ///   - dataUrl: The data URL string
-    ///   - filename: The filename to use for the download
-    private func handleDataUrlImage(dataUrl: String, filename: String) {
-        guard dataUrl.hasPrefix("data:"),
-              let commaIndex = dataUrl.firstIndex(of: ",") else { return }
-
-        let dataString = String(dataUrl[dataUrl.index(after: commaIndex)...])
-        guard let imageData = Data(base64Encoded: dataString) else { return }
-
-        // Save the image data directly
-        saveImageData(imageData, filename: filename)
-    }
-
-    /// Handles downloading images from blob URLs
-    /// - Parameters:
-    ///   - blobUrl: The blob URL string
-    ///   - filename: The filename to use for the download
-    private func handleBlobUrlImage(blobUrl: String, filename: String) {
-        guard let altoWebView = webView as? ADKWebView else { return }
-
-        // Use JavaScript to convert blob to base64
-        let script = """
-        (function() {
-            fetch('\(blobUrl)')
-                .then(response => response.blob())
-                .then(blob => {
-                    const reader = new FileReader();
-                    reader.onload = function() {
-                        window.webkit.messageHandlers.blobDownload.postMessage({
-                            data: reader.result,
-                            filename: '\(filename)'
-                        });
-                    };
-                    reader.readAsDataURL(blob);
-                })
-                .catch(error => console.error('Error downloading blob:', error));
-        })();
-        """
-
-        // Add handler for blob download
-        altoWebView.configuration.userContentController.add(self, name: "blobDownload")
-        altoWebView.evaluateJavaScript(script) { _, error in
-            if let error {
-                print("Error executing blob download script: \(error)")
-            }
-        }
-    }
-
-    /// Saves image data to the downloads folder
-    /// - Parameters:
-    ///   - imageData: The image data to save
-    ///   - filename: The filename to use
-    private func saveImageData(_ imageData: Data, filename: String) {
-        // Get downloads directory
-        guard let downloadsUrl = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first else {
-            print("Could not access downloads directory")
-            return
-        }
-
-        let fileUrl = downloadsUrl.appendingPathComponent(filename)
-
-        do {
-            try imageData.write(to: fileUrl)
-            print("✅ Image saved to: \(fileUrl.path)")
-
-            // Post notification for successful download
-            NotificationCenter.default.post(
-                name: NSNotification.Name("AltoDownloadCompleted"),
-                object: nil,
-                userInfo: ["url": fileUrl.absoluteString, "filename": filename]
-            )
-        } catch {
-            print("❌ Error saving image: \(error)")
-        }
-    }
 }
 
 // MARK: WKNavigationDelegate, WKUIDelegate
@@ -327,79 +145,23 @@ extension ADKWebPage: WKNavigationDelegate, WKUIDelegate {
     ///   - navigation: The navigation object
     public func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
         title = webView.title ?? "test"
-
+        
         if let url = webView.url {
             FaviconManager.shared.fetchFaviconFromHTML(webView: webView, baseURL: url) { [weak self] image in
                 DispatchQueue.main.async { self?.favicon = image }
             }
         }
-
+        
         canGoBack = webView.canGoBack
         canGoForward = webView.canGoForward
     }
-
+    
     /// Called when the web view is closed
     /// - Parameter webView: The web view that was closed
     public func webViewDidClose(_: WKWebView) {
         parent?.closeTab()
     }
-
-    /// Decides whether to allow or cancel a navigation action
-    /// - Parameters:
-    ///   - webView: The web view requesting the navigation
-    ///   - navigationAction: The navigation action to evaluate
-    ///   - decisionHandler: The completion handler to call with the decision
-    public func webView(
-        action webView: WKWebView,
-        decidePolicyFor navigationAction: WKNavigationAction,
-        decisionHandler: @escaping (WKNavigationActionPolicy) -> ()
-    ) {
-        guard let url = navigationAction.request.url else {
-            decisionHandler(.allow)
-            return
-        }
-
-        // Skip download check for blob and data URLs as they're handled differently
-        if url.scheme == "blob" || url.scheme == "data" {
-            decisionHandler(.allow)
-            return
-        }
-
-        if isDownloadableFile(url: url) {
-            handleDownload(url: url)
-            decisionHandler(.cancel)
-            return
-        }
-
-        decisionHandler(.allow)
-    }
-
-    /// Decides whether to allow or cancel a navigation response
-    /// - Parameters:
-    ///   - webView: The web view that received the response
-    ///   - navigationResponse: The navigation response to evaluate
-    ///   - decisionHandler: The completion handler to call with the decision
-    public func webView(
-        response webView: WKWebView,
-        decidePolicyFor navigationResponse: WKNavigationResponse,
-        decisionHandler: @escaping (WKNavigationResponsePolicy) -> ()
-    ) {
-        guard let response = navigationResponse.response as? HTTPURLResponse,
-              let url = response.url else {
-            decisionHandler(.allow)
-            return
-        }
-
-        if shouldTriggerDownload(for: response) {
-            let filename = extractFilename(from: response) ?? url.lastPathComponent
-            handleDownload(url: url, filename: filename)
-            decisionHandler(.cancel)
-            return
-        }
-
-        decisionHandler(.allow)
-    }
-
+    
     /// Creates a new web view for handling new window requests
     /// - Parameters:
     ///   - webView: The web view requesting the new window
@@ -407,7 +169,6 @@ extension ADKWebPage: WKNavigationDelegate, WKUIDelegate {
     ///   - navigationAction: The navigation action that triggered the request
     ///   - windowFeatures: The window features for the new window
     /// - Returns: A new web view instance or nil if the request should be ignored
-
     public func webView(
         _: WKWebView,
         createWebViewWith configuration: WKWebViewConfiguration,
@@ -415,150 +176,17 @@ extension ADKWebPage: WKNavigationDelegate, WKUIDelegate {
         windowFeatures _: WKWindowFeatures
     ) -> WKWebView? {
         guard navigationAction.targetFrame == nil else { return nil }
-
+        
         let newWebView = ADKWebView(frame: .zero, configuration: configuration)
-
+        
         if navigationAction.navigationType != .other,
            let url = navigationAction.request.url {
             newWebView.load(URLRequest(url: url))
         }
-
+        
         return createNewTab(with: newWebView)
     }
-
-    // MARK: - Private Helper Methods
-
-    /// Determines if a URL points to a downloadable file based on its extension
-    /// Uses UniformTypeIdentifiers to dynamically categorize file types
-    /// - Parameter url: The URL to check
-    /// - Returns: True if the file should be downloaded, false otherwise
-    private func isDownloadableFile(url: URL) -> Bool {
-        let pathExtension = url.pathExtension.lowercased()
-        guard !pathExtension.isEmpty else { return false }
-        guard let utType = UTType(filenameExtension: pathExtension) else { return false }
-
-        return utType.conforms(to: .archive) ||
-            utType.conforms(to: .diskImage) ||
-            utType.conforms(to: .executable) ||
-            utType.conforms(to: .package) ||
-            utType.conforms(to: .spreadsheet) ||
-            utType.conforms(to: .presentation) ||
-            (utType.conforms(to: .data) &&
-                !utType.conforms(to: .text) &&
-                !utType.conforms(to: .image) &&
-                !utType.conforms(to: .audiovisualContent)
-            ) ||
-            utType == .pdf ||
-            utType.identifier.hasPrefix("com.microsoft.") ||
-            utType.identifier.hasPrefix("org.openxmlformats.") ||
-            isInstallerType(utType)
-    }
-
-    /// Checks if the UTType represents an installer package
-    /// - Parameter utType: The UTType to check
-    /// - Returns: True if it's an installer type, false otherwise
-    private func isInstallerType(_ utType: UTType) -> Bool {
-        utType.identifier == "com.apple.installer-package-archive" ||
-            utType.identifier == "com.microsoft.msi-installer" ||
-            utType.identifier == "org.debian.deb-archive" ||
-            utType.identifier == "com.redhat.rpm-archive" ||
-            utType.identifier.contains("installer")
-    }
-
-    /// Initiates a download for the specified URL
-    /// - Parameters:
-    ///   - url: The URL to download
-    ///   - filename: Optional filename override
-    private func handleDownload(url: URL, filename: String? = nil) {
-        let finalFilename = filename ?? url.lastPathComponent
-
-        // Validate URL string to prevent sandbox extension errors
-        let urlString = url.absoluteString
-        guard !urlString.isEmpty, urlString != "about:blank" else {
-            print("⚠️ Skipping download for invalid URL: \(urlString)")
-            return
-        }
-
-        print("🚀 Detected download URL: \(urlString)")
-
-        NotificationCenter.default.post(
-            name: NSNotification.Name("AltoDownloadRequested"),
-            object: nil,
-            userInfo: ["url": urlString, "filename": finalFilename]
-        )
-    }
-
-    /// Determines if an HTTP response should trigger a download
-    /// - Parameter response: The HTTP response to evaluate
-    /// - Returns: True if the response should trigger a download, false otherwise
-    private func shouldTriggerDownload(for response: HTTPURLResponse) -> Bool {
-        // Check Content-Disposition header first
-        if let contentDisposition = response.allHeaderFields["Content-Disposition"] as? String,
-           contentDisposition.lowercased().contains("attachment") {
-            return true
-        }
-
-        // Check Content-Type dynamically
-        if let contentType = response.allHeaderFields["Content-Type"] as? String {
-            return isDownloadableMimeType(contentType)
-        }
-
-        // Fallback to file extension check
-        guard let url = response.url else { return false }
-        return isDownloadableFile(url: url)
-    }
-
-    /// Determines if a MIME type represents a downloadable file
-    /// Uses UniformTypeIdentifiers for dynamic type checking
-    /// - Parameter mimeType: The MIME type to evaluate
-    /// - Returns: True if the MIME type represents a downloadable file, false otherwise
-    private func isDownloadableMimeType(_ mimeType: String) -> Bool {
-        let cleanMimeType = mimeType.components(separatedBy: ";")
-            .first?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .lowercased() ?? ""
-
-        guard let utType = UTType(mimeType: cleanMimeType) else {
-            // Handle common cases that might not have UTType mappings
-            return cleanMimeType.hasPrefix("application/") &&
-                !cleanMimeType.hasPrefix("application/json") &&
-                !cleanMimeType.hasPrefix("application/xml") &&
-                !cleanMimeType.hasPrefix("application/javascript")
-        }
-
-        return utType.conforms(to: .archive) ||
-            utType.conforms(to: .diskImage) ||
-            utType.conforms(to: .executable) ||
-            utType.conforms(to: .package) ||
-            utType.conforms(to: .spreadsheet) ||
-            utType.conforms(to: .presentation) ||
-            utType == .pdf ||
-            (utType.conforms(to: .data) &&
-                !utType.conforms(to: .text) &&
-                !utType.conforms(to: .image) &&
-                !utType.conforms(to: .audiovisualContent) &&
-                !utType.conforms(to: .json) &&
-                !utType.conforms(to: .xml)
-            ) ||
-            utType.identifier.hasPrefix("com.microsoft.") ||
-            utType.identifier.hasPrefix("org.openxmlformats.") ||
-            isInstallerType(utType)
-    }
-
-    /// Extracts the filename from an HTTP response's Content-Disposition header
-    /// - Parameter response: The HTTP response to parse
-    /// - Returns: The extracted filename or nil if not found
-    private func extractFilename(from response: HTTPURLResponse) -> String? {
-        guard let contentDisposition = response.allHeaderFields["Content-Disposition"] as? String else { return nil }
-
-        return contentDisposition
-            .components(separatedBy: ";")
-            .first { $0.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("filename=") }?
-            .replacingOccurrences(of: "filename=", with: "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .trimmingCharacters(in: CharacterSet(charactersIn: "\""))
-    }
-
+    
     /// Creates a new tab with the provided web view
     /// - Parameter webView: The web view to use for the new tab
     /// - Returns: The created web view instance
@@ -568,17 +196,75 @@ extension ADKWebPage: WKNavigationDelegate, WKUIDelegate {
         newTab.location = parent?.location
         newTab.setContent(content: newWebPage)
         newWebPage.parent = newTab
-
+        
         let newTabIndex = parent?.tabRepresentation?.index ?? 0
         let tabRep = TabRepresentation(id: newTab.id, index: newTabIndex)
         newTab.tabRepresentation = tabRep
-
+        
         state.tabManager.addTab(newTab)
-        parent?.location?.appendTabRep(tabRep)
-
+        parent?.location?.addTab(tabRep)
+        
         CookiesManager.shared.setupCookies(for: webView)
         state.tabManager.setActiveTab(newTab)
-
+        
         return webView
+    }
+    
+    // Preforms a download if the user navagates to a page that initiates a download
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+        if navigationAction.shouldPerformDownload {
+            print("should preform download")
+            decisionHandler(.download, preferences)
+        } else {
+            decisionHandler(.allow, preferences)
+        }
+    }
+    
+    // if the user navagates to a page where the content is not displayable it downloads the content instead
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        if navigationResponse.canShowMIMEType {
+            decisionHandler(.allow)
+        } else {
+            print("should preform download 2")
+            decisionHandler(.download)
+        }
+    }
+    
+    // Asignes the webpage as the delagete for what just got downloaded
+    public func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
+        download.delegate = self
+    }
+    
+    // Asignes the webpage as the delagete for what just got downloaded
+    public func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
+        download.delegate = self
+    }
+}
+
+import SwiftUI
+import WebKit
+
+extension ADKWebPage: WKDownloadDelegate {
+    
+    public func download(_ download: WKDownload, decideDestinationUsing response: URLResponse, suggestedFilename: String, completionHandler: @escaping (URL?) -> Void) {
+        print("download called!")
+        let documentsURL = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
+        let destinationURL = documentsURL.appendingPathComponent(suggestedFilename)
+        
+        completionHandler(destinationURL)
+    }
+    
+    public func downloadDidFinish(_ download: WKDownload) {
+        print("download complete")
+    }
+    
+    public func download(_ download: WKDownload, didFailWithError error: any Error, resumeData: Data?) {
+        print("download failed")
+    }
+    
+    public func download(_ download: WKDownload, decidePlaceholderPolicy completionHandler: @escaping @MainActor (WKDownload.PlaceholderPolicy, URL?) -> Void) {
+        let downloadsDirectory = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first!
+        print("ran decide placeholder policy")
+        completionHandler(.enable, downloadsDirectory)
     }
 }

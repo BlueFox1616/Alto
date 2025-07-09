@@ -124,6 +124,8 @@ open class Profile {
     public private(set) var isDefault: Bool
     public private(set) var cookieStore: WKWebsiteDataStore
     private var userData: UserData
+    
+    public var favorites = FavoriteTabs()
 
     public var asDictionary: [String: String] {
         var data: [String: String] = [
@@ -199,25 +201,6 @@ public enum ArchiveTime: String, Codable, CaseIterable {
         case .day: "24 Hours"
         case .week: "7 Days"
         case .month: "30 Days"
-        }
-    }
-}
-
-extension Bool {
-    func toString() -> String {
-        if self {
-            "true"
-        } else {
-            "false"
-        }
-    }
-
-    init(string: String) {
-        let string = string.lowercased()
-        if string == "true" {
-            self = true
-        } else {
-            self = false
         }
     }
 }

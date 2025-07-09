@@ -15,12 +15,15 @@ import SwiftUI
 public final class PreferencesManager {
     public static let shared = PreferencesManager()
 
-    
-    var colorScheme: ColorSchemePreference = ColorSchemePreference(rawValue: Defaults.retreiveValue(key: .colorScheme, as: String.self) ?? "system")! {
+    var colorScheme = ColorSchemePreference(rawValue: Defaults
+        .retreiveValue(key: .colorScheme, as: String.self) ?? "system"
+    )! {
         didSet { Defaults.updateValue(value: colorScheme.rawValue, key: .colorScheme) }
     }
 
-    var searchEngine: SearchEngine = SearchEngine(rawValue: Defaults.retreiveValue(key: .searchEngine, as: String.self) ?? "google")! {
+    var searchEngine = SearchEngine(rawValue: Defaults
+        .retreiveValue(key: .searchEngine, as: String.self) ?? "google"
+    )! {
         didSet { Defaults.updateValue(value: searchEngine.rawValue, key: .searchEngine) }
     }
 
@@ -84,7 +87,7 @@ public final class PreferencesManager {
         sidebarPosition = position
         storedSidebarPosition = position.rawValue
     }
-    
+
     public static func getDownloadPath(from string: String) -> URL {
         if string.isEmpty {
             // Default to Downloads folder
@@ -99,7 +102,7 @@ public final class PreferencesManager {
             }
         }
     }
-    
+
     // Method to update download path and persist it
     public func setDownloadPath(_ path: URL) {
         downloadPath = path
@@ -114,4 +117,3 @@ public enum SidebarPosition: String, CaseIterable {
     case left
     case right
 }
-

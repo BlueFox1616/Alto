@@ -15,24 +15,13 @@ import WebKit
 ///
 ///  Tabs will be stored in Alto in future in order to support tabs being shared between windows (like Arc)
 @Observable
-open class TabManager {
+class TabManager {
     public var state: AltoState?
     public var currentTab: ADKTab?
     private var profile: Profile?
     public var currentSpace: Space?
 
-
-    private var defaultTabLocation: TabLocation {
-        tabLocations[0]
-    }
-
-    public var tabLocations: [TabLocation] = []
-
     public init(state: AltoState? = nil, profile: Profile? = nil, tabLocations: [TabLocation]? = nil) {
-        let tabLocations = [
-            TabLocation(title: "favorites")
-        ]
-
         self.state = state
         self.profile = profile
     }
@@ -52,10 +41,6 @@ open class TabManager {
     public func setActiveTab(_ tab: ADKTab) {
         print("ran set active tab")
         currentTab = tab
-    
-        if let tab = tab as? ADKWebPage {
-            tab.webView.url
-        }
     }
 
     public func closeActiveTab() {
@@ -72,36 +57,39 @@ open class TabManager {
 
     public func removeTab(_ id: UUID) {
         let tab = AltoData.shared.getTab(id: id)
-        tab?.location?.removeTab(id: id)
+        tab?.location?.removeTab(id:id)
         AltoData.shared.tabs.removeValue(forKey: id)
     }
-
-    public func getLocation(_ location: String) -> TabLocation? {
-        let spaceLocations = currentSpace?.localLocations ?? []
-        let allTabs = tabLocations + spaceLocations
-        return allTabs.first(where: { $0.title == location })
-    }
-
 
     public func createNewTab(
         url: String = "https://www.google.com/",
         frame: CGRect = .zero,
-        location: String
+        location: TabLocations
     ) {
         guard let state else {
             return
         }
-
         
-        guard let tabLocation = getLocation(location) else {
+        let tabLocation: TabLocation?
+        switch location {
+        case .daily:
+            tabLocation = currentSpace?.dailyTabs
+        case .pinned:
+            tabLocation = currentSpace?.pinnedTabs
+        case .favorite:
+            tabLocation = currentSpace?.profile?.favorites
+        }
+        guard let tabLocation = tabLocation else {
+            print("failed to find tab location")
             return
         }
 
-        let profile = AltoData.shared.spaceManager.currentSpace?.profile ?? ProfileManager.shared.defaultProfile
+        let profile = self.currentSpace?.profile ?? ProfileManager.shared.defaultProfile
         let dataStore = WKWebsiteDataStore(forIdentifier: profile.id)
         let configuration = ADKWebViewConfigurationBase(dataStore: dataStore)
 
-        let newWebView = ADKWebView(frame: frame)
+        let newWebView = ADKWebView(frame: frame, configuration: configuration)
+        
         CookiesManager.shared.setupCookies(for: newWebView)
 
         if let url = URL(string: url) {
@@ -110,7 +98,6 @@ open class TabManager {
         }
 
         let newTab = ADKTab(state: state)
-        newTab.location = tabLocation
 
         let newWebPage = ADKWebPage(webView: newWebView, state: state, parent: newTab)
         newWebPage.parent = newTab
@@ -122,23 +109,19 @@ open class TabManager {
 
         addTab(newTab)
 
-        tabLocation.appendTabRep(tabRep)
+        tabLocation.addTab(tabRep)
         setActiveTab(newTab)
     }
 
-    open func createNewTab(
+     func createNewTab(
         newTab: ADKTab,
         location: TabLocation? = nil
     ) {
-        guard let state else {
+
+        guard let tabLocation = location ?? currentSpace?.dailyTabs else {
+            print("failed to find tab location")
             return
         }
-
-        let tabLocation = location ?? defaultTabLocation
-
-        let profile = profile ?? ProfileManager.shared.defaultProfile
-        let dataStore = WKWebsiteDataStore(forIdentifier: profile.id)
-        let configuration = ADKWebViewConfigurationBase(dataStore: dataStore)
 
         newTab.location = tabLocation
 
@@ -149,7 +132,7 @@ open class TabManager {
 
         addTab(newTab)
 
-        tabLocation.appendTabRep(tabRep)
+        tabLocation.addTab(tabRep)
         setActiveTab(newTab)
     }
 }

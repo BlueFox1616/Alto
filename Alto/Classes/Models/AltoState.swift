@@ -7,27 +7,26 @@ import Observation
 public class AltoState {
     // MARK: - Peramaters
 
-    public var id = UUID()
-    public var tabManager: TabManager
+    var id = UUID()
+    var tabManager: TabManager
 
-    public weak var window: AltoWindow? = nil
+    public weak var window: AltoWindow?
     public var currentContent: [any Displayable]? {
         window?.setTitle("No Title") // TODO: handle nil case
         return tabManager.currentTab?.content // TODO: Move current tab to tab manager
     }
-    
+
     var sidebar = true
     var sidebarIsRight = false
-//    The Command Palette needs to be visible on startup due to the Browser Spec
+    // The Command Palette needs to be visible on startup due to the Browser Spec
     var isShowingCommandPalette = true
     var Topbar: AltoTopBarViewModel.TopbarState = .hidden
-    var draggedTab: TabRepresentation? = nil
+    var draggedTab: TabRepresentation?
 
     public init() {
-        
         let altoManager = TabManager()
         altoManager.currentSpace = AltoData.shared.spaces[0]
-        self.tabManager = altoManager
+        tabManager = altoManager
         tabManager.state = self // Feeds in the state for the tab manager
     }
 
@@ -39,7 +38,7 @@ public class AltoState {
             Topbar = .hidden
         }
     }
-    
+
     public func setup(webView: WKWebView) {
         CookiesManager.shared.setupCookies(for: webView)
     }

@@ -2,7 +2,7 @@
 import SwiftUI
 
 @Observable
-open class AltoWindowManager {
+class AltoWindowManager {
     public static let shared = AltoWindowManager()
 
     public var defaultConfig: DefaultWindowConfiguration = .init()
@@ -16,7 +16,7 @@ open class AltoWindowManager {
     public init() {}
 
     @discardableResult
-    open func createWindow(
+    func createWindow(
         profile: Profile? = nil,
         tabs: [ADKTab] = [],
         contentRect: NSRect? = nil

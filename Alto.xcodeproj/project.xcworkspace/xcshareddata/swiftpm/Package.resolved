@@ -1,6 +1,15 @@
 {
-  "originHash" : "42df9460c5276cc3a4777a502ba089fdc3e9589b35a521d7a6b45ec050ee241f",
+  "originHash" : "2c829ded44ce76f7faf5c991e0fcd9e0a907110a2899bc99be37a577d0fc9846",
   "pins" : [
+    {
+      "identity" : "equatable",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ordo-one/equatable.git",
+      "state" : {
+        "revision" : "d78d51e7c30ac232e3ca4ea0e498eb0b233b2ac7",
+        "version" : "1.0.4"
+      }
+    },
     {
       "identity" : "swift-algorithms",
       "kind" : "remoteSourceControl",
@@ -17,6 +26,15 @@
       "state" : {
         "revision" : "e0ec0f5f3af6f3e4d5e7a19d2af26b481acb6ba8",
         "version" : "1.0.3"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-syntax.git",
+      "state" : {
+        "revision" : "f99ae8aa18f0cf0d53481901f88a0991dc3bd4a2",
+        "version" : "601.0.1"
       }
     },
     {

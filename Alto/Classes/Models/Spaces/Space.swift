@@ -29,8 +29,9 @@ public class Space: Identifiable, Equatable {
     public var profile: Profile?
     // TODO: add a theme manager, a designated profile, and search engine
 
-    public var localLocations: [TabLocation]
-
+    public var pinnedTabs = PinnedTabs()
+    public var dailyTabs = DailyTabs()
+    
     // MARK: - Initialization
 
     /// A default space class for use in the browser
@@ -50,8 +51,6 @@ public class Space: Identifiable, Equatable {
         self.name = name ?? "Space _"
         self.icon = icon
         self.currentTab = currentTab
-
-        self.localLocations = localLocations ?? [TabLocation()]
 
         self.profile = profile
     }

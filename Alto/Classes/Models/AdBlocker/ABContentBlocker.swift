@@ -122,7 +122,6 @@ public final class ABContentBlocker: NSObject, ObservableObject {
 
     /// Create multiple rule lists from a large set of rules
     private func createMultipleRuleLists(from allRules: [ABContentRule]) async throws -> [WKContentRuleList] {
-        logger.info("🔧 Splitting \(allRules.count) rules into multiple rule lists (max \(self.maxRulesPerList) rules each)")
 
         // Separate blocking rules from whitelist rules
         var blockingRules: [ABContentRule] = []
@@ -866,17 +865,6 @@ private final class ABMessageHandler: NSObject, WKScriptMessageHandler {
 
         default:
             logger.debug("📨 JS MESSAGE: \(body)")
-        }
-    }
-}
-
-// MARK: - Array Extension for Chunking
-
-extension Array {
-    /// Split array into chunks of specified size
-    func chunked(into size: Int) -> [[Element]] {
-        stride(from: 0, to: count, by: size).map {
-            Array(self[$0 ..< Swift.min($0 + size, count)])
         }
     }
 }

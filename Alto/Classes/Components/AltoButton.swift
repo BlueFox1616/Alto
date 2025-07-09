@@ -24,3 +24,34 @@ struct AltoButton: View {
         .buttonStyle(PlainButtonStyle())
     }
 }
+
+
+struct AltoButtonStyle: ButtonStyle {
+    var isActive: Bool = true
+    @State var isHovered: Bool = false
+    
+    let hoveredColor: Color = .gray.opacity(0.4)
+    let nonHoveredColor: Color = .clear
+    
+    let activeOpacity = 1.0
+    let inacticeOpacity = 0.35
+    
+    var showActive: Bool {
+        isActive && isHovered
+    }
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(isActive ? activeOpacity : inacticeOpacity)
+            .background {
+                RoundedRectangle(cornerRadius: 5)
+                    .fill(showActive ? hoveredColor : nonHoveredColor)
+                    .onHover { hovered in
+                        isHovered = hovered
+                    }
+            }
+            .animation(.bouncy, value: isActive)
+            .animation(.bouncy, value: showActive)
+            .aspectRatio(1, contentMode: .fit)
+    }
+}

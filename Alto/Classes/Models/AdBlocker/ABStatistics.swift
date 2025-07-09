@@ -191,7 +191,6 @@ public final class ABStatistics: ObservableObject {
             pageStats.removeValue(forKey: key)
         }
 
-        logger.debug("🧹 Cleaned up old page stats, kept \(self.pageStats.count) entries")
     }
 
     private func resetCounters() {
@@ -236,7 +235,6 @@ public final class ABStatistics: ObservableObject {
 
         loadBlockedDomains(from: defaults)
 
-        logger.info("📊 Loaded statistics: \(self.totalBlockedRequests) blocked, \(self.totalRequests) total")
     }
 
     private func loadBlockedDomains(from defaults: UserDefaults) {

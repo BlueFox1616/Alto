@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+// MARK: - SuggestionRow
+
+/// A Suggestion row used in the search Command Palette
 struct SuggestionRow: View {
     let suggestion: SearchSuggestion
     let isSelected: Bool

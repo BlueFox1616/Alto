@@ -10,15 +10,6 @@ import Observation
 import SwiftUI
 import WebKit
 
-// MARK: - NSImage Extension
-
-extension NSImage {
-    /// Validates that the NSImage is valid and has proper dimensions
-    var isValid: Bool {
-        size.width > 0 && size.height > 0 && !representations.isEmpty
-    }
-}
-
 // MARK: - FaviconCacheEntry
 
 /// Represents a cached favicon entry with metadata

@@ -48,7 +48,6 @@ public final class ABFilterListManager: ObservableObject {
         setupDefaultFilterLists()
         loadFilterListsFromFile()
         loadCacheFromFiles()
-        logger.info("📋 AdBlock storage initialized at: \(self.applicationSupportURL.path)")
     }
 
     // MARK: - Setup
@@ -79,7 +78,6 @@ public final class ABFilterListManager: ObservableObject {
         availableFilterLists[index].isEnabled.toggle()
         saveFilterListsToFile()
 
-        logger.info("🔄 Toggled filter list \(filterList.name): \(self.availableFilterLists[index].isEnabled ? "ON" : "OFF")")
     }
 
     /// Add a custom filter list
@@ -423,7 +421,6 @@ public final class ABFilterListManager: ObservableObject {
             }
 
             if rules.count >= maxParsingRules {
-                logger.warning("⚠️ Reached maximum parsing rules limit (\(self.maxParsingRules))")
                 break
             }
         }
@@ -685,7 +682,6 @@ public final class ABFilterListManager: ObservableObject {
                 }
             }
 
-            logger.info("📋 Loaded \(self.filterListCache.count) cached filter lists from files")
         } catch {
             logger.warning("⚠️ Failed to load filter cache directory: \(error)")
         }
@@ -703,9 +699,8 @@ public final class ABFilterListManager: ObservableObject {
                 await MainActor.run {
                     self.availableFilterLists[i].lastUpdated = Date()
                 }
-                logger.info("✅ Updated filter list: \(self.availableFilterLists[i].name)")
+                
             } catch {
-                logger.error("❌ Failed to update filter list \(self.availableFilterLists[i].name): \(error)")
             }
         }
 

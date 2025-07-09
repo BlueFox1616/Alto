@@ -25,11 +25,12 @@ public class ADKWebViewConfigurationBase: WKWebViewConfiguration {
         preferences.javaScriptCanOpenWindowsAutomatically = true
         preferences.isFraudulentWebsiteWarningEnabled = true
         preferences.setValue(true, forKey: "developerExtrasEnabled")
+        preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
         allowsAirPlayForMediaPlayback = true
         preferences._setAllowsPicture(inPictureMediaPlayback: true)
         preferences._setBackspaceKeyNavigationEnabled(false)
         preferences.isElementFullscreenEnabled = true
-
+        
         defaultWebpagePreferences.preferredContentMode = .desktop
         defaultWebpagePreferences.allowsContentJavaScript = true
     }

@@ -7,11 +7,18 @@
 
 import SwiftUI
 
+// MARK: - CommandPaletteView
+
 struct CommandPaletteView: View {
+    
+    // MARK: - Private Properties
+    
     @Environment(AltoState.self) private var altoState
     @FocusState private var isSearchFocused: Bool
     @State private var viewModel: ViewModel = .init()
 
+    // MARK: - Body
+    
     var body: some View {
         ZStack {
 //            Dimming Layer
@@ -41,7 +48,7 @@ struct CommandPaletteView: View {
 
                                 viewModel.handlePerformSearch(
                                     text: textToSubmit,
-                                    tabManager: altoState.tabManager as? TabManager,
+                                    tabManager: altoState.tabManager,
                                     altoState: altoState
                                 )
                             }

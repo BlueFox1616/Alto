@@ -13,32 +13,32 @@ import WebKit
 
 /// A Genaric Tab class that can be subclassed for more specific browser use cases
 @Observable
-open class ADKTab: NSObject, Identifiable, ADKTabProtocol {
-    public let id = UUID()
+public class ADKTab: NSObject, Identifiable {
+     public let id = UUID()
 
-    public var tabRepresentation: TabRepresentation?
+     var tabRepresentation: TabRepresentation?
 
-    public var location: TabLocation?
+     var location: TabLocation?
 
-    public var content: [any Displayable] = []
+     var content: [any Displayable] = []
 
-    public var activeContent: Displayable?
+     var activeContent: Displayable?
 
-    public var state: AltoState
+     var state: AltoState
 
-    public var manager: TabManager? {
+     var manager: TabManager? {
         state.tabManager
     }
 
-    public var isCurrentTab: Bool {
+     var isCurrentTab: Bool {
         manager?.currentTab?.id == id
     }
 
-    public init(state: AltoState) {
+     init(state: AltoState) {
         self.state = state
     }
 
-    public func setContent(content addedContent: any Displayable) {
+     func setContent(content addedContent: any Displayable) {
         if !content.isEmpty {
             content[0] = addedContent
             activeContent = addedContent
@@ -48,9 +48,10 @@ open class ADKTab: NSObject, Identifiable, ADKTabProtocol {
         }
     }
 
-    public func createNewTab(_: String, _: WKWebViewConfiguration, frame _: CGRect = .zero) {}
+     func createNewTab(_: String, _: WKWebViewConfiguration, frame _: CGRect = .zero) {}
 
-    public func closeTab() {
+     func closeTab() {
+         print("called close tab on:", self.content[0].title )
         location?.removeTab(id: id)
         state.tabManager.removeTab(id)
         activeContent = nil
@@ -62,21 +63,4 @@ open class ADKTab: NSObject, Identifiable, ADKTabProtocol {
             manager?.currentTab = nil
         }
     }
-}
-
-// MARK: - ADKTabProtocol
-
-public protocol ADKTabProtocol: AnyObject, Identifiable {
-    var id: UUID { get }
-    var tabRepresentation: TabRepresentation? { get set }
-    var location: TabLocation? { get set }
-    var content: [any Displayable] { get set }
-    var activeContent: Displayable? { get set }
-    var state: AltoState { get }
-    var manager: TabManager? { get }
-    var isCurrentTab: Bool { get }
-
-    func setContent(content: any Displayable)
-    func createNewTab(_ url: String, _ config: WKWebViewConfiguration, frame: CGRect)
-    func closeTab()
 }

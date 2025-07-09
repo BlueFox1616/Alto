@@ -20,7 +20,6 @@ public class AltoData {
     // Global shared data across browser windows
     public var tabs: [UUID: ADKTab] = [:]
     public var spaces: [Space] = []
-    private var Favorites: [UUID: TabLocation] = [:] // TODO: have each profile just contain a tab location
 
     private var profiles: [Profile] {
         ProfileManager.shared.profiles
@@ -34,23 +33,14 @@ public class AltoData {
     private init() {
         spaceManager = SpaceManager()
 
+        
         let defaultProfile = ProfileManager.shared.defaultProfile
+        
+        // Temporary decleration of spaces
         spaces = [
-            Space(profile: defaultProfile, name: "Latent Space", localLocations: [
-                TabLocation(title: "pinned"),
-                TabLocation(title: "unpinned")
-            ]),
-            Space(profile: defaultProfile, name: "The Final Frontier", localLocations: [
-                TabLocation(title: "pinned"),
-                TabLocation(title: "unpinned")
-            ])
+            Space(profile: defaultProfile, name: "Latent Space"),
+            Space(profile: defaultProfile, name: "The Final Frontier")
         ]
-    }
-
-    public func setupFavoriteTabLocations() {
-        for profile in profiles {
-            Favorites[profile.id] = TabLocation()
-        }
     }
 
     public func getTab(id: UUID) -> ADKTab? {

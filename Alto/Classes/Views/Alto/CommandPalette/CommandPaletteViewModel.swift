@@ -48,10 +48,10 @@ extension CommandPaletteView {
 
             if searchManager.isValidURL(text) {
                 let normalizedText = searchManager.normalizeURL(text)
-                tabManager.createNewTab(url: normalizedText, location: "unpinned")
+                tabManager.createNewTab(url: normalizedText, location: .daily)
             } else {
                 if let safeSearchText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
-                    tabManager.createNewTab(url: searchManager.searchEngineURL + safeSearchText, location: "unpinned")
+                    tabManager.createNewTab(url: searchManager.searchEngineURL + safeSearchText, location: .daily)
                 }
             }
 

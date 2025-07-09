@@ -1,3 +1,7 @@
+//
+
+
+
 import Observation
 import SwiftUI
 
@@ -5,7 +9,6 @@ import SwiftUI
 class TabViewModel {
     var state: AltoState
     var tab: TabRepresentation
-    var draggingViewModel: DropZoneViewModel
     var tabManager: TabManager? {
         state.tabManager
     }
@@ -39,9 +42,8 @@ class TabViewModel {
         tab
     }
 
-    init(state: AltoState, draggingViewModel: DropZoneViewModel, tab: TabRepresentation) {
+    init(state: AltoState, tab: TabRepresentation) {
         self.state = state
-        self.draggingViewModel = draggingViewModel
         self.tab = tab
     }
 
