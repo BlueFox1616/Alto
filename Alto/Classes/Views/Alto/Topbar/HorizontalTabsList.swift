@@ -1,5 +1,5 @@
 //
-
+import SwiftUI
 
 // MARK: - HorizontalTabsList
 

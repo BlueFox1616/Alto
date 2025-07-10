@@ -57,7 +57,7 @@ struct NavigationButtonsView: View {
             
             AltoButton(
                 action: {
-                    AltoWindowManager.shared.createWindow()
+                    WindowManager.shared.createWindow()
                 },
                 icon: "macwindow.on.rectangle",
                 active: altoState.tabManager.currentTab?.content[0].canGoForward ?? false

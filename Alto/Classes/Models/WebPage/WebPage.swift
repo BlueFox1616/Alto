@@ -15,22 +15,22 @@ import WebKit
 /// A Protocol for what can be displayed as tab content
 public protocol Displayable {
     var parent: ADKTab? { get set }
-
+    
     var id: UUID { get }
     var title: String { get set }
     var favicon: NSImage? { get set }
-
+    
     var canGoBack: Bool { get set }
     var canGoForward: Bool { get set }
     var isLoading: Bool { get set }
-
+    
     func createNewTab(_ url: String, _ configuration: WKWebViewConfiguration, frame: CGRect)
     func goBack()
     func goForward()
-
+    
     func removeWebView()
-
-    func returnView() -> any View
+    
+    func returnView(_ isActive: Bool) -> any View
 }
 
 // MARK: - ADKWebPage
@@ -45,45 +45,52 @@ public protocol Displayable {
 public class ADKWebPage: NSObject, Identifiable, Displayable {
     /// Reference to the parent tab containing this web page
     public var parent: ADKTab?
-
+    
     /// The application state manager
     private var state: AltoState
-
+    
     /// Unique identifier for this web page instance
     public let id = UUID()
-
+    
     /// The title of the web page, automatically updates the window title when changed
     public var title = "Untitled" {
         didSet { state.window?.title = title }
     }
-
+    
     /// The underlying web view instance
     public var webView: webViewProtocol
-
+    
     /// The favicon image for this web page
     public var favicon: NSImage?
-
+    
     /// The NSView representation of the web view
     public var view: NSView { webView }
-
+    
     /// Whether the web view can navigate back
     public var canGoBack = false
-
+    
     /// Whether the web view can navigate forward
     public var canGoForward = false
-
+    
     /// Whether the web page is currently loading
     public var isLoading = false
-
+    
     /// UI delegate for handling web view UI events
     public var uiDelegate: WKUIDelegate?
-
+    
     /// Download delegate for handling download events
     public var downloadDelegate: WKDownloadDelegate?
-
+    
     /// Navigation delegate for handling navigation events
     public var navigationDelegate: WKNavigationDelegate?
-
+    
+    public var isInActiveWindow: Bool {
+        if WindowManager.shared.window?.state.currentContent?[0].id == self.id {
+            return true
+        } else {
+            return false
+        }
+    }
     /// Initializes a new WebPage instance
     /// - Parameters:
     ///   - webView: The AltoWebView instance to wrap
@@ -93,48 +100,78 @@ public class ADKWebPage: NSObject, Identifiable, Displayable {
         self.webView = webView
         self.state = state
         super.init()
-
+        
         state.setup(webView: webView)
         webView.ownerTab = self
         webView.uiDelegate = self
         webView.navigationDelegate = self
     }
-
+    
     /// Creates a new tab with the specified URL and configuration
     /// - Parameters:
     ///   - url: The URL to load in the new tab
     ///   - configuration: The web view configuration to use
     ///   - frame: The frame for the new web view
     public func createNewTab(_: String, _: WKWebViewConfiguration, frame _: CGRect) {}
-
+    
     /// Handles mouse down events to activate this tab
     public func handleMouseDown() {
         guard parent?.activeContent?.id != id else { return }
         parent?.activeContent = self
     }
-
+    
     /// Navigates the web view back in history
     public func goBack() { webView.goBack() }
-
+    
     /// Navigates the web view forward in history
     public func goForward() { webView.goForward() }
-
+    
     /// Removes and cleans up the web view
-
+    
     public func removeWebView() {
         webView.stopLoading()
         webView.delegate = nil
         webView.navigationDelegate = nil
     }
-
+    
     /// Returns the SwiftUI view representation of this web page
     /// - Returns: A SwiftUI view containing the web view or a Spacer if unavailable
-    public func returnView() -> any View {
-        guard let webview = webView as? ADKWebView else { return Spacer() }
+    public func returnView(_ isActive: Bool) -> any View {
+        guard let webview = webView as? ADKWebView else {
+            // Return a view that indicates an error or an empty state
+            return Spacer()
+        }
+        
+        let views = WindowManager.shared.windows.filter { $0.state.currentContent?[0].id == self.id }
+        
+        if views.count > 1 && !isActive {
+            let viewToCapture = webview
+            let rep = viewToCapture.bitmapImageRepForCachingDisplay(in: viewToCapture.bounds)!
+            viewToCapture.cacheDisplay(in: viewToCapture.bounds, to: rep)
+            
+            let img = NSImage(size: viewToCapture.bounds.size)
+            img.addRepresentation(rep)
+            
+            let view = GeometryReader { geometry in
+                Image(nsImage: img)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
+                    .overlay {
+                        Rectangle().fill(.black).opacity(0.4)
+                    }
+                    .background {
+                        Rectangle().fill(.black)
+                    }
+            }
+            return view
+        }
         let contentview = NSViewContainerView(contentView: webview)
         return WebViewContainer(contentView: contentview, topContentInset: 0.0)
     }
 }
+
 
 // MARK: WKNavigationDelegate, WKUIDelegate
 

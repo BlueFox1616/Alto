@@ -32,21 +32,29 @@ struct BrowserContentView: View {
 }
 
 // MARK: - ContentView
-
 struct WebContentView: View {
     @Environment(AltoState.self) private var altoState
-
+    
+    @State private var activeWindow = WindowManager.shared.window
+    
+    var windowIsActive: Bool {
+        altoState.window?.id == activeWindow?.id
+    }
     var body: some View {
-        let currentContent = altoState.currentContent
-
-        if let currentContent {
-            ForEach(Array(currentContent.enumerated()), id: \.element.id) { _, content in
-                AnyView(content.returnView())
-                    .cornerRadius(10)
-                    .shadow(radius: 4)
+        Group {
+            if let currentContent = altoState.currentContent {
+                ForEach(Array(currentContent.enumerated()), id: \.element.id) { _, content in
+                    AnyView(content.returnView(windowIsActive))
+                        .cornerRadius(10)
+                        .shadow(radius: 4)
+                }
+            } else {
+                EmptyWebView()
             }
-        } else {
-            EmptyWebView()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { notification in
+            let window = notification.object as? AltoWindow
+            self.activeWindow = window ?? activeWindow
         }
     }
 }

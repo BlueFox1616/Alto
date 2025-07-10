@@ -24,7 +24,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Set up notification listener for new WebViews
         setupAdBlockNotificationListener()
 
-        AltoWindowManager.shared.createWindow()
+        WindowManager.shared.createWindow()
     }
 
     /// Set up notification listener for AdBlock integration

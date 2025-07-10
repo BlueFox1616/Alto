@@ -27,7 +27,20 @@ struct AltoButton: View {
 
 
 struct AltoButtonStyle: ButtonStyle {
-    var isActive: Bool = true
+    enum shape: Float, CaseIterable {
+        case square
+        case adaptive
+        
+        var asAspectRatio: CGFloat? {
+            switch self {
+            case .square: return 1
+            case .adaptive: return nil
+            }
+        }
+    }
+    
+    var isActive: Bool
+    var buttonShape: shape
     @State var isHovered: Bool = false
     
     let hoveredColor: Color = .gray.opacity(0.4)
@@ -50,8 +63,9 @@ struct AltoButtonStyle: ButtonStyle {
                         isHovered = hovered
                     }
             }
+        
             .animation(.bouncy, value: isActive)
             .animation(.bouncy, value: showActive)
-            .aspectRatio(1, contentMode: .fit)
+            .aspectRatio(buttonShape.asAspectRatio,contentMode: .fit)
     }
 }

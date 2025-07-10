@@ -2,18 +2,24 @@
 import SwiftUI
 
 @Observable
-class AltoWindowManager {
-    public static let shared = AltoWindowManager()
+class WindowManager {
+    public static let shared = WindowManager()
 
     public var defaultConfig: DefaultWindowConfiguration = .init()
 
     public var windows: [AltoWindow] = []
+    
+    // This is the currently active window
+    var window: AltoWindow? {
+        let output = (NSApplication.shared.keyWindow as? AltoWindow) ?? (NSApplication.shared.mainWindow as? AltoWindow)
+        return output
+    }
 
     private var defaultProfile: Profile {
         ProfileManager.shared.defaultProfile
     }
 
-    public init() {}
+    private init() {}
 
     @discardableResult
     func createWindow(
