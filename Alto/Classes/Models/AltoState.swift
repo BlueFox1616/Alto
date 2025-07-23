@@ -10,6 +10,8 @@ public class AltoState {
     var id = UUID()
     var tabManager: TabManager
 
+    public var activeWindow = WindowManager.shared.window
+    
     public weak var window: AltoWindow?
     public var currentContent: [any Displayable]? {
         window?.setTitle("No Title") // TODO: handle nil case

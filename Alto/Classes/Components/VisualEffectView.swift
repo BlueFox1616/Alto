@@ -7,12 +7,13 @@ import SwiftUI
 struct VisualEffectView: NSViewRepresentable {
     var material: NSVisualEffectView.Material
     var state: NSVisualEffectView.State
+    var blendingMode: NSVisualEffectView.BlendingMode?
     
     func makeNSView(context: Context) -> NSVisualEffectView {
         let view = NSVisualEffectView()
         view.material = material
         view.state = .active
-        view.blendingMode = .behindWindow
+        view.blendingMode = blendingMode ?? .behindWindow
         return view
     }
 

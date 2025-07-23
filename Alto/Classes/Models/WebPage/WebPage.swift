@@ -30,7 +30,6 @@ public protocol Displayable {
     
     func removeWebView()
     
-    func returnView(_ isActive: Bool) -> any View
 }
 
 // MARK: - ADKWebPage
@@ -43,6 +42,7 @@ public protocol Displayable {
 /// the browser's tab system and the underlying WKWebView.
 @Observable
 public class ADKWebPage: NSObject, Identifiable, Displayable {
+    
     /// Reference to the parent tab containing this web page
     public var parent: ADKTab?
     
@@ -58,7 +58,7 @@ public class ADKWebPage: NSObject, Identifiable, Displayable {
     }
     
     /// The underlying web view instance
-    public var webView: webViewProtocol
+    public var webView: ADKWebView
     
     /// The favicon image for this web page
     public var favicon: NSImage?
@@ -137,15 +137,11 @@ public class ADKWebPage: NSObject, Identifiable, Displayable {
     /// Returns the SwiftUI view representation of this web page
     /// - Returns: A SwiftUI view containing the web view or a Spacer if unavailable
     public func returnView(_ isActive: Bool) -> any View {
-        guard let webview = webView as? ADKWebView else {
-            // Return a view that indicates an error or an empty state
-            return Spacer()
-        }
-        
+                
         let views = WindowManager.shared.windows.filter { $0.state.currentContent?[0].id == self.id }
         
         if views.count > 1 && !isActive {
-            let viewToCapture = webview
+            let viewToCapture = webView
             let rep = viewToCapture.bitmapImageRepForCachingDisplay(in: viewToCapture.bounds)!
             viewToCapture.cacheDisplay(in: viewToCapture.bounds, to: rep)
             
@@ -158,20 +154,26 @@ public class ADKWebPage: NSObject, Identifiable, Displayable {
                     .aspectRatio(contentMode: .fill)
                     .frame(width: geometry.size.width, height: geometry.size.height)
                     .clipped()
-                    .overlay {
-                        Rectangle().fill(.black).opacity(0.4)
-                    }
                     .background {
                         Rectangle().fill(.black)
+                    }
+                    .blur(radius: 10)
+                    .overlay {
+                        
+                        VStack {
+                            Image(systemName: "eye.slash")
+                                .font(.system(size: 50))
+                                .frame(width: 70, height: 70)
+                            Text("This page is activly open in a diferent window")
+                                .font(.system(size: 20))
+                        }
                     }
             }
             return view
         }
-        let contentview = NSViewContainerView(contentView: webview)
-        return WebViewContainer(contentView: contentview, topContentInset: 0.0)
+        return WebViewContainer(webView: webView)
     }
 }
-
 
 // MARK: WKNavigationDelegate, WKUIDelegate
 
@@ -182,6 +184,25 @@ extension ADKWebPage: WKNavigationDelegate, WKUIDelegate {
     ///   - navigation: The navigation object
     public func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
         title = webView.title ?? "test"
+        
+        
+        let js = """
+            (function() {
+                var bg = window.getComputedStyle(document.body, null).getPropertyValue('background-color');
+            
+                return bg;
+            })();
+            """
+        
+        webView.evaluateJavaScript(js) { result, error in
+            if let color = result as? String {
+                print(color)
+                self.webView.backgroundColor = Color(cssRGBString: color)?.cgColor ?? CGColor.white
+            } else {
+                print("nothin")
+            }
+        }
+
         
         if let url = webView.url {
             FaviconManager.shared.fetchFaviconFromHTML(webView: webView, baseURL: url) { [weak self] image in
@@ -269,39 +290,11 @@ extension ADKWebPage: WKNavigationDelegate, WKUIDelegate {
     
     // Asignes the webpage as the delagete for what just got downloaded
     public func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
-        download.delegate = self
+        download.delegate = DownloadManager.shared.self
     }
     
     // Asignes the webpage as the delagete for what just got downloaded
     public func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
-        download.delegate = self
-    }
-}
-
-import SwiftUI
-import WebKit
-
-extension ADKWebPage: WKDownloadDelegate {
-    
-    public func download(_ download: WKDownload, decideDestinationUsing response: URLResponse, suggestedFilename: String, completionHandler: @escaping (URL?) -> Void) {
-        print("download called!")
-        let documentsURL = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
-        let destinationURL = documentsURL.appendingPathComponent(suggestedFilename)
-        
-        completionHandler(destinationURL)
-    }
-    
-    public func downloadDidFinish(_ download: WKDownload) {
-        print("download complete")
-    }
-    
-    public func download(_ download: WKDownload, didFailWithError error: any Error, resumeData: Data?) {
-        print("download failed")
-    }
-    
-    public func download(_ download: WKDownload, decidePlaceholderPolicy completionHandler: @escaping @MainActor (WKDownload.PlaceholderPolicy, URL?) -> Void) {
-        let downloadsDirectory = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first!
-        print("ran decide placeholder policy")
-        completionHandler(.enable, downloadsDirectory)
+        download.delegate = DownloadManager.shared.self
     }
 }

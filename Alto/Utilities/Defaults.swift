@@ -34,7 +34,7 @@ enum Defaults {
         let storedValue = asStoredValue(value)
         UserDefaults.standard.set(storedValue, forKey: key.rawValue)
     }
-
+    
     /// used to retreve the stored value froms userDefaults
     /// - Parameters:
     ///   - key: the key of the user defualt

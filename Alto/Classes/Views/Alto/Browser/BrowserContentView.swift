@@ -35,18 +35,16 @@ struct BrowserContentView: View {
 struct WebContentView: View {
     @Environment(AltoState.self) private var altoState
     
-    @State private var activeWindow = WindowManager.shared.window
+    @State private var windowIsActive: Bool = true
     
-    var windowIsActive: Bool {
-        altoState.window?.id == activeWindow?.id
-    }
     var body: some View {
         Group {
-            if let currentContent = altoState.currentContent {
-                ForEach(Array(currentContent.enumerated()), id: \.element.id) { _, content in
-                    AnyView(content.returnView(windowIsActive))
+            if let currentContent = altoState.currentContent?[0] as? ADKWebPage {
+                GeometryReader { geo in
+                    AnyView(currentContent.returnView(windowIsActive))
+                        .frame(width: geo.size.width, height: geo.size.height)
                         .cornerRadius(10)
-                        .shadow(radius: 4)
+                        .shadow(radius:4)
                 }
             } else {
                 EmptyWebView()
@@ -54,7 +52,9 @@ struct WebContentView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { notification in
             let window = notification.object as? AltoWindow
-            self.activeWindow = window ?? activeWindow
+            altoState.activeWindow = window ?? altoState.activeWindow
+            windowIsActive = altoState.window?.id == altoState.activeWindow?.id
         }
+        
     }
 }

@@ -17,6 +17,7 @@ public class AltoData {
 
     public static let shared = AltoData()
 
+    
     // Global shared data across browser windows
     public var tabs: [UUID: ADKTab] = [:]
     public var spaces: [Space] = []

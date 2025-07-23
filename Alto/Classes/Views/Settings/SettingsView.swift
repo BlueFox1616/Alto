@@ -15,25 +15,7 @@ struct SettingsView: View {
             Tab("General", systemImage: "gearshape") {
                 ZStack {
                     VStack(spacing: 0) {
-                        ZStack(alignment: .bottom) {
-                            Image("AltoHeader")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(maxWidth: .infinity, maxHeight: 250)
-                                .clipped()
-
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color.clear,
-                                    Color(NSColor.windowBackgroundColor)
-                                ]),
-                                startPoint: .center,
-                                endPoint: .bottom
-                            )
-                            .frame(height: 250)
-                            .frame(maxWidth: .infinity, alignment: .bottom)
-                        }
-                        .frame(maxHeight: 250)
+                        SettingsHeader()
                         SettingsRectangle {
                             SettingsCard {
                                 SettingsRow(title: "Default browser") {
@@ -170,5 +152,29 @@ struct SettingsRectangle<Content: View>: View {
             content
         }
         .scenePadding()
+    }
+}
+
+struct SettingsHeader: View {
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            Image("AltoHeader")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(maxWidth: .infinity, maxHeight: 250)
+                .clipped()
+
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.clear,
+                    Color(NSColor.windowBackgroundColor)
+                ]),
+                startPoint: .center,
+                endPoint: .bottom
+            )
+            .frame(height: 250)
+            .frame(maxWidth: .infinity, alignment: .bottom)
+        }
+        .frame(maxHeight: 250)
     }
 }

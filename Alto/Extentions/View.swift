@@ -23,23 +23,3 @@ extension View {
 #endif
     }
 }
-
-
-extension View {
-    func snapshot() -> NSImage {
-        let hostingView = NSHostingView(rootView: self)
-        
-        // Let the view size itself
-        hostingView.layoutSubtreeIfNeeded()
-        let fittingSize = hostingView.fittingSize
-        
-        hostingView.frame = CGRect(origin: .zero, size: fittingSize)
-
-        let rep = hostingView.bitmapImageRepForCachingDisplay(in: hostingView.bounds)!
-        hostingView.cacheDisplay(in: hostingView.bounds, to: rep)
-
-        let image = NSImage(size: fittingSize)
-        image.addRepresentation(rep)
-        return image
-    }
-}
