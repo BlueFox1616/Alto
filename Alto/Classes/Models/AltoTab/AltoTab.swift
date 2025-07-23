@@ -24,18 +24,19 @@ public class ADKTab: NSObject, Identifiable {
 
      var activeContent: Displayable?
 
-     var state: AltoState
+    var state: AltoState? {
+        return WindowManager.shared.window?.state
+    }
 
      var manager: TabManager? {
-        state.tabManager
+        state?.tabManager
     }
 
      var isCurrentTab: Bool {
         manager?.currentTab?.id == id
     }
 
-     init(state: AltoState) {
-        self.state = state
+     override init() {
     }
 
      func setContent(content addedContent: any Displayable) {
@@ -53,7 +54,7 @@ public class ADKTab: NSObject, Identifiable {
      func closeTab() {
          print("called close tab on:", self.content[0].title )
         location?.removeTab(id: id)
-        state.tabManager.removeTab(id)
+        state?.tabManager.removeTab(id)
         activeContent = nil
         for c in content {
             c.removeWebView()

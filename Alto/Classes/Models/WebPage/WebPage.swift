@@ -46,16 +46,13 @@ public class ADKWebPage: NSObject, Identifiable, Displayable {
     /// Reference to the parent tab containing this web page
     public var parent: ADKTab?
     
-    /// The application state manager
-    private var state: AltoState
-    
     /// Unique identifier for this web page instance
     public let id = UUID()
     
     /// The title of the web page, automatically updates the window title when changed
-    public var title = "Untitled" {
-        didSet { state.window?.title = title }
-    }
+    public var title = "Untitled" // {
+        // didSet { state.window?.title = title }
+    //}
     
     /// The underlying web view instance
     public var webView: ADKWebView
@@ -98,7 +95,6 @@ public class ADKWebPage: NSObject, Identifiable, Displayable {
     ///   - parent: Optional parent tab reference
     public init(webView: ADKWebView, state: AltoState, parent: ADKTab? = nil) {
         self.webView = webView
-        self.state = state
         super.init()
         
         state.setup(webView: webView)
@@ -248,9 +244,16 @@ extension ADKWebPage: WKNavigationDelegate, WKUIDelegate {
     /// Creates a new tab with the provided web view
     /// - Parameter webView: The web view to use for the new tab
     /// - Returns: The created web view instance
-    private func createNewTab(with webView: ADKWebView) -> WKWebView {
+    private func createNewTab(with webView: ADKWebView) -> WKWebView? {
+        
+        guard let currentWindow = WindowManager.shared.window else {
+            return nil
+        }
+        
+        let state = currentWindow.state
+        
         let newWebPage = ADKWebPage(webView: webView, state: state)
-        let newTab = ADKTab(state: state)
+        let newTab = ADKTab()
         newTab.location = parent?.location
         newTab.setContent(content: newWebPage)
         newWebPage.parent = newTab

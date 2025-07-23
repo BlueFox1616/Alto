@@ -97,7 +97,7 @@ class TabManager {
             newWebView.load(request)
         }
 
-        let newTab = ADKTab(state: state)
+        let newTab = ADKTab()
 
         let newWebPage = ADKWebPage(webView: newWebView, state: state, parent: newTab)
         newWebPage.parent = newTab
