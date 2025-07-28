@@ -12,7 +12,7 @@ import SwiftUI
 
 /// Custom verson of WKWebView to avoid needing an extra class for management
 @Observable
-public class ADKWebView: WKWebView, webViewProtocol {
+public class ADKWebView: WKWebView {
     public var ownerTab: ADKWebPage?
     public var currentConfiguration: WKWebViewConfiguration
     public var delegate: WKUIDelegate?
@@ -20,6 +20,9 @@ public class ADKWebView: WKWebView, webViewProtocol {
     
     private let backgroundView = NSView()
     private let backingView = NSView()
+    
+    private let contentControler: WKUserContentController
+    private let menuHandler: ContextMenuHandler
     
     public var backgroundColor: CGColor = NSColor.white.cgColor  {
         didSet {
@@ -32,8 +35,28 @@ public class ADKWebView: WKWebView, webViewProtocol {
     override init(frame: CGRect, configuration: WKWebViewConfiguration) {
         currentConfiguration = configuration
         
+        contentControler = configuration.userContentController
+        
+        menuHandler = ContextMenuHandler()
         
         super.init(frame: frame, configuration: configuration)
+
+        
+        guard let jsPath = Bundle.main.path(forResource: "ContextMenuHandler", ofType: "js") else {
+            print("Could not find ContextMenuHandler.js")
+            return
+        }
+
+        do {
+            let jsSource = try String(contentsOfFile: jsPath)
+            let userScript = WKUserScript(source: jsSource, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
+            self.configuration.userContentController.addUserScript(userScript)
+        } catch {
+            print("Failed to load JS: \(error)")
+        }
+        
+        contentControler.add(menuHandler, name: "menuHandler")
+        
         setupView()
         
         allowsMagnification = true
@@ -50,8 +73,6 @@ public class ADKWebView: WKWebView, webViewProtocol {
     required init?(coder _: NSCoder) {
         fatalError()
     }
-    
-    deinit {}
     
     private func setupView() {
         
@@ -89,43 +110,7 @@ public class ADKWebView: WKWebView, webViewProtocol {
     public override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         super.willOpenMenu(menu, with: event)
         
-        let items = menu.items
-        
-        var object = "nil"
-        
-        // For all default menu items which open a new Window, we add custom menu items
-        // to open the object in a new Tab and to add them to the bookmarks.
-        for idx in (0..<items.count).reversed() {
-            if let id = items[idx].identifier?.rawValue {
-                
-                if id == "WKMenuItemIdentifierOpenLinkInNewWindow" {
-                    object = "Link"
-                    break
-                } else if id == "WKMenuItemIdentifierOpenImageInNewWindow" {
-                    object = "Image"
-                    break
-                } else if id == "WKMenuItemIdentifierOpenMediaInNewWindow" {
-                    object = "Video"
-                    break
-                } else if id == "WKMenuItemIdentifierLookUp" {
-                    object = "Text"
-                    break
-                } else if id == "WKMenuItemIdentifierPaste" {
-                    object = "Editable"
-                    break
-                } else {
-                    object = "Frame"
-                }
-            }
-        }
-        
-        if object == "image" {
-            let tabMenuItem = NSMenuItem(title:"copy Image", action: #selector(downloadImage(_:)), keyEquivalent:"")
-            tabMenuItem.identifier = NSUserInterfaceItemIdentifier("TITLE")
-            tabMenuItem.target = self
-            // tabMenuItem.representedObject = items[idx]
-            menu.items.append(tabMenuItem)
-        }
+        // let items = menu.items
     }
     
     @objc func downloadImage(_ sender: NSMenuItem) {
@@ -138,13 +123,18 @@ public class ADKWebView: WKWebView, webViewProtocol {
     }
 }
 
-// MARK: - webViewProtocol
-
-public protocol webViewProtocol: WKWebView {
-    var currentConfiguration: WKWebViewConfiguration { get set }
-    var delegate: WKUIDelegate? { get set }
-    var navDelegate: WKNavigationDelegate? { get set }
+class ContextMenuHandler: NSObject, WKScriptMessageHandler {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard message.name == "menuHandler",
+              let info = message.body as? [String: Any] else {
+            return
+        }
+        
+        print(info)
+    }
 }
+
+
 
 enum ADKContextItems {
     // forward
@@ -163,18 +153,3 @@ enum ADKContextItems {
     
     //
 }
-
-public protocol WKContextMenuDelegate {
-    
-}
-
-
-class ADKContextMenuDelegate {
-    
-    
-    public func addMenuItem(title: String, action: () -> (), index: Int?) {
-        
-    }
-}
-
-

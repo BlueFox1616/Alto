@@ -33,5 +33,7 @@ public class ADKWebViewConfigurationBase: WKWebViewConfiguration {
         
         defaultWebpagePreferences.preferredContentMode = .desktop
         defaultWebpagePreferences.allowsContentJavaScript = true
+        
+        userContentController = WKUserContentController()
     }
 }
